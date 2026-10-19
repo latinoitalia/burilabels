@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0a0e0b" />
+  <title>BuriLabels — Trova le Piante</title>
+  <meta name="description" content="Esplora il parco con la realtà aumentata: identifica alberi e piante usando la fotocamera e il GPS." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  SPLASH / PERMISSION SCREEN               -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="splash" role="main" aria-label="Schermata di caricamento">
+  <div class="logo-ring" aria-hidden="true">🌿</div>
+  <h1>BuriLabels</h1>
+  <p>Punta la fotocamera verso gli alberi del parco per identificarli con la realtà aumentata</p>
+
+  <div class="perm-list" role="list" aria-label="Permessi richiesti">
+    <div class="perm-item" role="listitem">
+      <span class="icon" aria-hidden="true">📷</span>
+      <span>Fotocamera</span>
+      <div id="cam-status" class="status" aria-label="Stato permesso fotocamera"></div>
+    </div>
+    <div class="perm-item" role="listitem">
+      <span class="icon" aria-hidden="true">📍</span>
+      <span>Posizione GPS</span>
+      <div id="gps-status" class="status" aria-label="Stato permesso GPS"></div>
+    </div>
+    <div class="perm-item" role="listitem">
+      <span class="icon" aria-hidden="true">🧭</span>
+      <span>Bussola</span>
+      <div id="ori-status" class="status" aria-label="Stato permesso bussola"></div>
+    </div>
+  </div>
+
+  <button id="start-btn" aria-label="Avvia l'applicazione">
+    Inizia l'esplorazione
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  MAIN AR APP                              -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="app" role="application" aria-label="Visore AR piante">
+
+  <!-- Camera feed -->
+  <video id="camera-feed" autoplay muted playsinline aria-label="Feed fotocamera"></video>
+
+  <!-- AR Overlay -->
+  <div id="ar-overlay" aria-live="polite" aria-label="Etichette AR piante">
+    <!-- AR corner decorations -->
+    <div class="ar-corner tl" aria-hidden="true"></div>
+    <div class="ar-corner tr" aria-hidden="true"></div>
+    <div class="ar-corner bl" aria-hidden="true"></div>
+    <div class="ar-corner br" aria-hidden="true"></div>
+    <!-- Plant labels injected here by JS -->
+  </div>
+
+  <!-- Top HUD -->
+  <div id="hud-top" aria-label="Indicatori stato">
+    <!-- Compass -->
+    <div id="compass-widget" aria-label="Bussola">
+      <span id="compass-rose" class="compass-rose" aria-hidden="true">🧭</span>
+      <span id="compass-heading" aria-label="Orientamento in gradi">--°</span>
+      <span id="compass-direction" aria-label="Direzione cardinale">-</span>
+    </div>
+    <!-- GPS -->
+    <div id="gps-widget" aria-label="Stato GPS">
+      <div id="gps-dot" class="gps-dot searching" aria-hidden="true"></div>
+      <span id="gps-text">Ricerca GPS…</span>
+    </div>
+  </div>
+
+  <!-- Nearest plant alert badge -->
+  <div id="nearest-badge" role="status" aria-live="polite">
+    <span class="badge-arrow">▲</span>
+    <span id="nearest-text"></span>
+  </div>
+
+  <!-- No plants message -->
+  <div id="no-plants-msg" aria-live="polite" aria-label="Nessuna pianta nelle vicinanze">
+    <div class="no-plant-icon">🔍</div>
+    <p>Nessuna pianta trovata nel raggio di 80 m.<br/>Avvicinati al parco di Villa Buri.</p>
+  </div>
+
+  <!-- ─── Bottom Drawer ─── -->
+  <div id="drawer-wrapper">
+    <div id="drawer" class="collapsed" role="complementary" aria-label="Dettagli pianta">
+
+      <!-- Drag handle -->
+      <div id="drawer-handle" role="button" tabindex="0"
+           aria-label="Trascina verso l'alto per aprire i dettagli"
+           onkeydown="if(event.key==='Enter'||event.key===' '){document.getElementById('drawer-peek').click()}">
+        <div class="drag-pill" aria-hidden="true"></div>
+        <span class="handle-hint">Trascina su per i dettagli</span>
+      </div>
+
+      <!-- Peek preview (always visible) -->
+      <div id="drawer-peek" role="button" tabindex="0"
+           aria-label="Mostra dettagli della pianta selezionata"
+           onkeydown="if(event.key==='Enter'||event.key===' '){this.click()}">
+        <div class="peek-icon" id="peek-icon" aria-hidden="true">🌿</div>
+        <div class="peek-text">
+          <div class="peek-name" id="peek-name">Avvicinati a una pianta</div>
+          <div class="peek-sci"  id="peek-sci">Nessuna pianta rilevata</div>
+        </div>
+        <div class="peek-dist" id="peek-dist" aria-label="Distanza dalla pianta"></div>
+        <span id="peek-arrow" aria-hidden="true">⌃</span>
+      </div>
+
+      <!-- Expandable content -->
+      <div id="drawer-content" aria-label="Informazioni dettagliate sulla pianta">
+        <!-- Populated dynamically -->
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /#app -->
+
+<!-- Scripts -->
+<script src="plants-db.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
